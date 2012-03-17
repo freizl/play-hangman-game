@@ -3,7 +3,7 @@
  */
 
 require('./arrayUtil.js');
-var wordsFile = './words.txt';
+var wordsFile = '../data/words.txt';
 var encoding  = 'utf-8';
 var englishAlp = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 var fs = require('fs');
