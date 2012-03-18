@@ -1,0 +1,6 @@
+1.
+in imterprive language, expression can be written line by line.
+But not same thing in haskell.
+So comes `let`, `Monad`
+
+
