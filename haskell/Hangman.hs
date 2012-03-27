@@ -86,10 +86,10 @@ compareLetter x y z
   Guess Job
 -}
 --type HangmanGameState = State HangmanGame GameStatus
-type HangmanGameState = StateT HangmanGame IO GameStatus
+type HangmanGameState = StateT HangmanGame IO
 
 class Guess a where
-  makeGuess :: a -> HangmanGameState
+  makeGuess :: a -> HangmanGameState GameStatus
   
 {- 
   make a guess either by guessing a letter or a word

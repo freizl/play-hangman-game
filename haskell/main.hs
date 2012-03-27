@@ -1,71 +1,57 @@
 module Main where
 
 import Control.Monad.State
-import qualified Data.Map as Map
 import Control.Monad.Trans
+import qualified Data.Map as Map
+import System.Environment (getArgs)
 
-import WordsOp
+import GameRandom
+import GameStrategy
 import Hangman
 import Types
-import GameStrategy
+import WordsOp
 
 main :: IO ()
 main = do
+       args <- getArgs
        WDS ws wm <- defaultWords
-       let word        = "allopatric" --ws !! 880
-           wl          = length word
-           wsPerLength = Map.lookup wl wm 
-           game        = initHG word in
-         case wsPerLength of
-           Just xs -> do
-                      g <- playgame (buildSimpleStrategy xs) game
-                      print $ displayGame g
-           Nothing -> print "data error"
+       rs        <- randomRange (testWordsNum args) (length ws)
+       let words = [ ws !! i | i <- rs ]
+       ys        <- mapM (playgame' wm) words
+       print $ "DONE: " ++ show (length $ filter (== GAME_WON) ys) ++ "/" ++ show (length words)
+     where testWordsNum :: [String] -> Int
+           testWordsNum []    = 2
+           testWordsNum (i:_) = read i
 
--- | Build a Strategy base one words which have same length to secret word. 
+
+-- | Build a Strategy base on words which have same length to secret word. 
 buildSimpleStrategy :: [EnglishWord] -> SimpleStrategy
 buildSimpleStrategy xs = SimpleStrategy letters words ' '
                          where letters = buildListLetterFrequency $ buildMapWordsFrequency xs
                                words = xs
 
 -- |  Run
-playgame :: SimpleStrategy -> HangmanGame -> IO HangmanGame
-playgame  = execStateT . run
-
+playgame' :: Map.Map Int [EnglishWord] -> SecretWord -> IO GameStatus
+playgame' map sw = case Map.lookup (length sw) map of
+                     Just xs -> evalStateT ( run (buildSimpleStrategy xs) ) (initHG sw)
+                     Nothing -> return GAME_LOST
+  
 -- | FIXME: non-deminited if keeping guessing same letter
-run :: SimpleStrategy -> HangmanGameState
+run :: SimpleStrategy -> HangmanGameState GameStatus
 run gs = do
            hg <- get
            case gameStatus hg of
              KEEP_GUESSING -> do
                               (guess, updatedStrategy) <- lift $ runStateT (nextGuess hg) gs
-                              liftIO $ print "===========================++"
-                              liftIO $ print guess
-                              liftIO $ print updatedStrategy
+                              --liftIO $ print "===========================++"
+                              --liftIO $ print guess
+                              --liftIO $ print updatedStrategy
                               makeGuess guess
-                              newhg <- get
-                              liftIO $ print $ displayGame newhg
+                              logHangmanGame
                               run updatedStrategy
              x             -> return x
 
-
-
-{-
-  TODOs
--}
-
--- | FIXME: log
---type GameLogWriter = WriterT [String] HangmanGameState ()
-
-
-
---class GameStrategy s where
---  nextGuess :: HangmanGame -> s
---  
---instance GameStrategy DummyStrategyState where
---  nextGuess hg = do
---                s <- get
---                let ls = getLetters s
---                    l = head ls
---                    r = tail ls in
---                  put (DummyStrategy r) >> return (GL l)
+logHangmanGame :: HangmanGameState ()
+logHangmanGame = do
+    hg <- get
+    liftIO $ print $ displayGame hg

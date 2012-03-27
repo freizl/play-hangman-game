@@ -37,9 +37,9 @@ data SimpleStrategy = SimpleStrategy { candidateLetters :: [Letter]
                                      , candidateWords   :: [EnglishWord]
                                      , lastLetter       :: Letter
                                      }
---                      deriving (Show)
+
 instance Show SimpleStrategy where
-  show (SimpleStrategy ls ws ll) = ll : "->" ++ show ls ++ (show $ take 5 ws)
+  show (SimpleStrategy ls ws ll) = ll : "->" ++ show ls ++ show (take 5 ws)
 
 data DummyStrategy = DummyStrategy { getLetters :: [Letter] }
 

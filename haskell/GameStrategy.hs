@@ -17,15 +17,13 @@ type SimpleStrategyState = StateT SimpleStrategy IO NextGuess
 nextGuess :: HangmanGame -> SimpleStrategyState
 nextGuess hg = do
     s1 <- get
---    liftIO $ print s1
     modify (updateNextGuessWords hg)
     ss@(SimpleStrategy cl cw ll) <- get
-    liftIO $ print $ (show $ gameWrongGuessesMade hg) ++ "," ++ (show $ length cw)
-    if (gameWrongGuessesMade hg + length cw <= 5) || gameWrongGuessesMade hg >= 3 then --gameWrongGuessesMade hg <=
+    --liftIO $ print $ (show $ gameWrongGuessesMade hg) ++ "," ++ (show $ length cw)
+    if (gameWrongGuessesMade hg + length cw <= 5) || gameWrongGuessesMade hg >= 3 then
       put (SimpleStrategy cl (tail cw) ll) >> return (GW $ head cw)
     else
       return (GL ll)
---    put (SimpleStrategy (tail cl) cw (head cl)) >> return (GL $ head cl)
 
 -- | Narrow down possible words for guessing.
 updateNextGuessWords :: HangmanGame -> SimpleStrategy -> SimpleStrategy
