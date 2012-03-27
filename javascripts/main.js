@@ -3,7 +3,14 @@ var gs = require("./guessingstrategy.js");
 var words = require("./words.js");
 var ran = require('./random.js');
 
-var ranWords = genRandomWords();
+var oneWord = process.argv[2];
+
+var ranWords = [];
+if (oneWord) {
+    ranWords = [oneWord];
+} else {
+    ranWords = genRandomWords();
+}
 var result = ranWords.map(playHangman);
 console.log(">>> RESULT:", result.filter(function (x) {return x===hm.status.GW;}).length , "/",result.length);
 

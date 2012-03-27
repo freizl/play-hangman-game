@@ -10,15 +10,17 @@ GuessingStrategy.prototype.nextGuess = function (game) {
                   game.incorrectlyGuessedLetters,
                   game.getGuessedSoFar());
     var nl = me.nextLetter();
-    if(nl 
-       && (me.possibleWords.length === 0
-           || game.numWrongGuessesRemaining() < me.possibleWords.length
-           || game.numWrongGuessesMade() <= 3 )
-       ) {
-           me.lastLetter = nl;
-           return new gj.GuessLetter(nl);
-    } else if(me.possibleWords.length > 0){
+    
+    // TODO: this could be improved.
+    // e.g. what is the best strategy when remaining guess chance is 2
+    //      and possibleWords size is 4
+    if(me.possibleWords.length > 0 
+       && (game.numWrongGuessesRemaining() >= me.possibleWords.length
+          || game.numWrongGuessesMade() >= 3)){
         return new gj.GuessWord(me.nextWord());
+    } else if (nl) {
+        me.lastLetter = nl;
+        return new gj.GuessLetter(nl);
     }
     return 0;
 };
@@ -58,7 +60,9 @@ GuessingStrategy.prototype.buildWords = function (correctlyGuessedLetters, incor
 
     // include all words that match pattern of guessed so far.
     if(me.possibleWords && me.possibleWords.length > 0) {
+        // turn out filter by reg improve performance at certain percentage.
         if(correctlyGuessedLetters.size() > 0 || incorrectlyGuessedLetters.size() > 0) {
+            // TODO: could be more precisely cause both list can be non-empty
             if(incorrectlyGuessedLetters.size() > 0) {
                 gsf = gsf.replace(/-/g, "[^" + incorrectlyGuessedLetters.xs.join("") + "]");
             } else {
