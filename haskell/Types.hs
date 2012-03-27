@@ -30,12 +30,16 @@ data HangmanGame = HG { secretWord :: SecretWord
                    deriving (Show)
 
 data NextGuess = GL Letter | GW EnglishWord
+               deriving (Show)
 
 
 data SimpleStrategy = SimpleStrategy { candidateLetters :: [Letter]
                                      , candidateWords   :: [EnglishWord]
+                                     , lastLetter       :: Letter
                                      }
-                      deriving (Show)
+--                      deriving (Show)
+instance Show SimpleStrategy where
+  show (SimpleStrategy ls ws ll) = ll : "->" ++ show ls ++ (show $ take 5 ws)
 
 data DummyStrategy = DummyStrategy { getLetters :: [Letter] }
 

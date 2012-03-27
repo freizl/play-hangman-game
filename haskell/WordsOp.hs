@@ -4,8 +4,8 @@
 module WordsOp
   ( defaultWords
   , buildMapByLength
-  , wordsFrequencyMap
-  , lettersByWordsFrequency
+  , buildListLetterFrequency
+  , buildMapWordsFrequency
   ) where
 
 import Control.Monad (liftM)
@@ -60,6 +60,9 @@ wordsFrequencyMap ws = Map.mapWithKey f init
                        where init = Map.fromList [ (x, []) | x <- englishAlp ]
                              f k _ = [ b | b <- ws, k `elem` b]
 
+buildMapWordsFrequency :: [EnglishWord] -> Map.Map Char [EnglishWord]
+buildMapWordsFrequency = wordsFrequencyMap
+
 {-
   @param@ wordsObj :: {"a":[...], "b":[...], ...}
   @return@ list which elements are order by word frequency.
@@ -68,3 +71,5 @@ wordsFrequencyMap ws = Map.mapWithKey f init
 lettersByWordsFrequency :: Map.Map Char [EnglishWord] -> [Letter]
 lettersByWordsFrequency v = reverse $ map fst $ sortBy (compare `on` swap) $ Map.toList (Map.map length v)
 
+buildListLetterFrequency :: Map.Map Char [EnglishWord] -> [Letter]
+buildListLetterFrequency = lettersByWordsFrequency

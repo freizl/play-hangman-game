@@ -7,6 +7,7 @@ import Control.Monad.Trans
 import WordsOp
 import Hangman
 import Types
+import GameStrategy
 
 main :: IO ()
 main = do
@@ -16,40 +17,35 @@ main = do
            wsPerLength = Map.lookup wl wm 
            game        = initHG word in
          case wsPerLength of
-           Just xs -> print $ displayGame $ playgame (buildSimpleStrategy xs) game
+           Just xs -> do
+                      g <- playgame (buildSimpleStrategy xs) game
+                      print $ displayGame g
            Nothing -> print "data error"
 
 -- | Build a Strategy base one words which have same length to secret word. 
 buildSimpleStrategy :: [EnglishWord] -> SimpleStrategy
-buildSimpleStrategy xs = SimpleStrategy letters words
-                         where letters = lettersByWordsFrequency $ wordsFrequencyMap xs
-                               words = []
-
--- | FIXME: is it possible to do : `forall a. State a NextGuess
---type DummyStrategyState = State DummyStrategy NextGuess  
-type StrategyState = State SimpleStrategy NextGuess
-
--- | Fetch next guess per current hame and update the strategy state
-nextGuess' :: HangmanGame -> StrategyState
-nextGuess' hg = do
-                s <- get
-                let ls = candidateLetters s
-                    ws = candidateWords s
-                    l = head ls
-                    r = tail ls in
-                  put (SimpleStrategy r ws) >> return (GL l)
+buildSimpleStrategy xs = SimpleStrategy letters words ' '
+                         where letters = buildListLetterFrequency $ buildMapWordsFrequency xs
+                               words = xs
 
 -- |  Run
-playgame :: SimpleStrategy -> HangmanGame -> HangmanGame
-playgame  = execState . run 
+playgame :: SimpleStrategy -> HangmanGame -> IO HangmanGame
+playgame  = execStateT . run
 
 -- | FIXME: non-deminited if keeping guessing same letter
 run :: SimpleStrategy -> HangmanGameState
 run gs = do
            hg <- get
            case gameStatus hg of
-             KEEP_GUESSING -> let (guess, updatedStrategy) = runState (nextGuess' hg) gs in
-                              makeGuess guess >> run updatedStrategy
+             KEEP_GUESSING -> do
+                              (guess, updatedStrategy) <- lift $ runStateT (nextGuess hg) gs
+                              liftIO $ print "===========================++"
+                              liftIO $ print guess
+                              liftIO $ print updatedStrategy
+                              makeGuess guess
+                              newhg <- get
+                              liftIO $ print $ displayGame newhg
+                              run updatedStrategy
              x             -> return x
 
 
@@ -59,7 +55,7 @@ run gs = do
 -}
 
 -- | FIXME: log
---type GameLogWriter = Writer GameLog ()
+--type GameLogWriter = WriterT [String] HangmanGameState ()
 
 
 

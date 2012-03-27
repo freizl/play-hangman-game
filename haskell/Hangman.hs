@@ -14,29 +14,30 @@ displayGame hg = intercalate ";"
 
 -- | A dummy hangman game
 dummyHG = HG "" defaultMaxWrongGuess "" (S.fromList []) (S.fromList []) (S.fromList [])
+
 initHG :: SecretWord -> HangmanGame
-initHG sw = HG sw defaultMaxWrongGuess (replicate (length sw) '-') (S.fromList []) (S.fromList []) (S.fromList [])
+initHG sw = HG sw defaultMaxWrongGuess (replicate (length sw) ml) (S.fromList []) (S.fromList []) (S.fromList [])
 
 -- | Game score calculation
 gameScore :: HangmanGame -> Int
 gameScore hg 
   | gameStatus hg == GAME_LOST = 25
-  | otherwise                  = numWrongGuessesMade hg + S.size (correctGuessedLetters hg)
+  | otherwise                  = gameWrongGuessesMade hg + S.size (correctGuessedLetters hg)
 
 -- | Number of wrong guess made so far
-numWrongGuessesMade :: HangmanGame -> Int
-numWrongGuessesMade hg =  S.size (incorrectGuessedLetters hg)
-                        + S.size (incorrectGuessedWords hg)
+gameWrongGuessesMade :: HangmanGame -> Int
+gameWrongGuessesMade hg =  S.size (incorrectGuessedLetters hg)
+                         + S.size (incorrectGuessedWords hg)
 
 -- | Current game status
 gameStatus :: HangmanGame -> GameStatus
 gameStatus hg
   | guessedSoFar hg == secretWord hg            = GAME_WON
-  | numWrongGuessesMade hg > maxWrongGuesses hg = GAME_LOST                              
+  | gameWrongGuessesMade hg > maxWrongGuesses hg = GAME_LOST                              
   | otherwise                                   = KEEP_GUESSING       
 
-mysteryLetter :: Letter
-mysteryLetter = '-'
+ml :: Letter
+ml = '-'
 
 defaultMaxWrongGuess :: Int
 defaultMaxWrongGuess = 5
@@ -84,8 +85,8 @@ compareLetter x y z
 {-
   Guess Job
 -}
-type HangmanGameState = State HangmanGame GameStatus
-
+--type HangmanGameState = State HangmanGame GameStatus
+type HangmanGameState = StateT HangmanGame IO GameStatus
 
 class Guess a where
   makeGuess :: a -> HangmanGameState
