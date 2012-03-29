@@ -38,7 +38,7 @@ Executable playHangmanGame
   hs-source-dirs:   src
   extensions:       ExistentialQuantification, DoAndIfThenElse
                     --  Rank2Types, MultiParamTypeClasses
-  build-depends:    base         >= 4.2,
+  build-depends:    base         >= 4.2  && < 5.0,
                     containers   >= 0.4,
                     directory    >= 1.1,
                     mtl          >= 2.0,
