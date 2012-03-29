@@ -15,8 +15,9 @@ type GuessedSoFar   = [Letter]
 type GuessedLetters = S.Set Letter
 type GuessedWords   = S.Set EnglishWord
 
-type WordsPerLength = Map.Map Int [EnglishWord]
-type WordDataSet    = ([EnglishWord], WordsPerLength)
+type MapPerLength   = Map.Map Int [EnglishWord]
+type WordDataSet    = ([EnglishWord], MapPerLength)
+type MapPerAlphabet = Map.Map Char [EnglishWord]
 
 data GameStatus  = GAME_WON | GAME_LOST | KEEP_GUESSING
                    deriving (Show, Eq)

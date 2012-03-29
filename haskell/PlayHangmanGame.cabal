@@ -3,68 +3,53 @@
 -- http://www.haskell.org/cabal/release/cabal-latest/doc/users-guide/authors.html#pkg-descr.
 -- The name of the package.
 Name:                PlayHangmanGame
+Description: 
+  Write a program doing
+  .
+  1. pick a list of words randomly
+  .
+  2. play hangman agaist each of word
+  .
+  3. the judgement are:
+     - successful rate
+     - wrong guess rate
+     - running time
 
--- The package version. See the Haskell package versioning policy
--- (http://www.haskell.org/haskellwiki/Package_versioning_policy) for
--- standards guiding when and how versions should be incremented.
-Version:             0.1
-
--- A short (one-line) description of the package.
+Version:             0.1.1
 Synopsis:            Play Hangman Game
-
--- A longer description of the package.
--- Description:         
-
--- URL for the project homepage or repository.
 Homepage:            freizl.github.com
-
--- The license under which the package is released.
+Copyright:           (c) 2012 Simon Wu
 License:             BSD3
-
--- The file containing the license text.
 License-file:        LICENSE
-
--- The package author(s).
 Author:              Simon Wu
-
--- An email address to which users can send suggestions, bug reports,
--- and patches.
 Maintainer:          freizl@gmail.com
-
--- A copyright notice.
--- Copyright:           
-
 Category:            Game
-
 Build-type:          Simple
+Cabal-version:       >=1.6
+Data-files:          data/words.list
+Extra-source-files:  src/*.hs
 
--- Extra files to be distributed with the package, such as examples or
--- a README.
--- Extra-source-files:  
-
--- Constraint on the version of Cabal needed to build this package.
-Cabal-version:       >=1.2
-
+Flag Prof
+   Description: build with profile enabled
+   Default: False
 
 Executable playHangmanGame
-  -- .hs or .lhs file containing the Main module.
-   Main-is:          main.hs
-  
-  -- Packages needed in order to build this package.
-  -- TODO: is it possible add depends automatically??
-  Build-depends:     base         >= 4.2,
+  main-is:          main.hs
+  hs-source-dirs:   src
+  build-depends:     base         >= 4.2,
                      containers   >= 0.4,
                      directory    >= 1.1,
                      mtl          >= 2.0,
                      regex-compat >= 0.95,
                      random       >= 1.0
-  -- Modules not exported by this package.
   -- Other-modules:       
-  
-  -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
-  -- Build-tools:         
-  ghc-options: -O2 
+  -- ghc-options: -O2 -prof
+  -- --enable-executable-profiling
+  if flag(prof)
+    ghc-options: -auto-all -rtsopts
 
-  -- TODO: include words.txt
-  --       specify language extension at cabal file
+
+  -- TODO: is it possible add build-depends automatically??
+  -- TODO: specify language extension at cabal file rather that at src file
   
+

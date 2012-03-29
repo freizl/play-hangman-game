@@ -51,11 +51,11 @@ englishAlp :: [Letter]
 englishAlp = "abcdefghijklmnopqrstuvwxyz"
 
 {-
- Splitted Word List by alp sequency.
+ Splitted Word List by alphabet sequency.
  @param@ a sorted list that has words with same length.
  @return@ {"a": [...], "b":[...], ... }
 -}
-buildMapWordsFrequency :: [EnglishWord] -> Map.Map Char [EnglishWord]
+buildMapWordsFrequency :: [EnglishWord] -> MapPerAlphabet
 buildMapWordsFrequency ws = Map.mapWithKey f init
                        where init = Map.fromList [ (x, []) | x <- englishAlp ]
                              f k _ = [ b | b <- ws, k `elem` b]

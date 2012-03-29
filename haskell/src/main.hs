@@ -24,7 +24,7 @@ main = do
            testWordsNum (i:_) = read i
 
 -- |  Run
-playgame' :: WordsPerLength -> SecretWord -> IO GameStatus
+playgame' :: MapPerLength -> SecretWord -> IO GameStatus
 playgame' map sw = case Map.lookup (length sw) map of
                      Just xs -> evalStateT ( run (newSimpleStrategy xs) ) (initHG sw)
                      Nothing -> return GAME_LOST

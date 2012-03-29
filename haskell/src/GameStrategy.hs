@@ -24,39 +24,44 @@ import Guess
 data SimpleStrategy = SimpleStrategy { candidateLetters :: [Letter]
                                      , candidateWords   :: [EnglishWord]
                                      , lastLetter       :: Letter
+                                     , mapAlphabet      :: MapPerAlphabet
                                      }
 
 -- | Build a Strategy base on words which have same length to secret word. 
 newSimpleStrategy :: [EnglishWord] -> SimpleStrategy
-newSimpleStrategy xs = SimpleStrategy letters words ' '
-  where letters = buildListLetterFrequency $ buildMapWordsFrequency xs
-        words = xs
+newSimpleStrategy xs = SimpleStrategy letters words ' ' map
+  where map = buildMapWordsFrequency xs
+        letters = buildListLetterFrequency map
+        words = []
 
 instance Show SimpleStrategy where
-  show (SimpleStrategy ls ws ll) = ll : "->" ++ show ls ++ show (take 5 ws)
+  show (SimpleStrategy ls ws ll _) = ll : "->" ++ show ls ++ show (take 5 ws)
 
 instance GameStategy SimpleStrategy where
   nextGuess hg = do
     s1 <- get
     modify (updateNextGuessWords hg)
-    ss@(SimpleStrategy cl cw ll) <- get
+    ss@(SimpleStrategy cl cw ll map) <- get
     -- FIXME: complicated if-else thus need lang ext DoAndIfThenElse. can be simple??
-    if (gameWrongGuessesMade hg + length cw <= 5) || gameWrongGuessesMade hg >= 3 then
-      put (SimpleStrategy cl (tail cw) ll) >> return (NextGuess $ GuessWord $ head cw)
+    liftIO $ print $ take 5 cw
+    if (length cw > 0) && ((gameWrongGuessesMade hg + length cw <= 5) || gameWrongGuessesMade hg >= 3) then
+      put (SimpleStrategy cl (tail cw) ll map) >> return (NextGuess $ GuessWord $ head cw)
     else
       return (NextGuess $ GuessLetter ll)
   
 -- | Narrow down possible words for guessing.
 updateNextGuessWords :: Hangman -> SimpleStrategy -> SimpleStrategy
-updateNextGuessWords (Hangman _ _ gsf ils cls iws) (SimpleStrategy cl cw ll) =
-    let possibles = fetchWordsPerLetter ll (buildMapWordsFrequency cw)
+updateNextGuessWords (Hangman _ _ gsf ils cls iws) (SimpleStrategy cl cw ll map) =
+    let possibles = fetchWordsPerLetter ll map
         i         = S.toList ils
         c         = S.toList cls
         cw1       = correctGuess ll c i cw possibles
         cw2       = filterPossiblesPerGuessed i c gsf cw1
-        ls        = if (length cw2 > 0) then ((buildListLetterFrequency $ buildMapWordsFrequency cw2) \\ i) \\ c else cl
+        map1      = if length cw2 > 0 then buildMapWordsFrequency cw2 else map
+        ls        = if (length cw2 > 0) then ((buildListLetterFrequency map1) \\ i) \\ c else cl
       in
-      (SimpleStrategy (tail ls) cw2 (head ls))
+      (SimpleStrategy (tail ls) cw2 (head ls) map1)
+
         
 fetchWordsPerLetter :: Char -> Map.Map Char [a] -> [a]
 fetchWordsPerLetter lastLetter m
@@ -66,9 +71,8 @@ fetchWordsPerLetter lastLetter m
                           Just xs -> xs
                           Nothing -> []
 
--- | `origins` having all possible words at initilization.
 correctGuess lastLetter corrects incorrects origins possibles
-  | lastLetter `elem` corrects && length origins > 0     = origins `intersect` possibles
+  | lastLetter `elem` corrects && length origins > 0     = origins `union` possibles
   | lastLetter `elem` corrects && length origins == 0    = possibles
   | lastLetter `elem` incorrects                         = origins \\ possibles  
   | otherwise                                            = origins
