@@ -18,10 +18,10 @@ Description:
 Version:             0.2
 Synopsis:            Play Hangman Game
 Homepage:            freizl.github.com
-Copyright:           (c) 2012 Simon Wu
+Copyright:           (c) 2012 Haisheng Wu
 License:             BSD3
 License-file:        LICENSE
-Author:              Simon Wu
+Author:              Haisheng Wu
 Maintainer:          freizl@gmail.com
 Category:            Game
 Build-type:          Simple
