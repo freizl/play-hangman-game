@@ -36,9 +36,9 @@ readfile' fp = do
 
 wrapWordDataSet :: String -- ^ File Content
                 -> WordDataSet -- ^ Wrapped data set
-wrapWordDataSet [] = WDS [] Map.empty
+wrapWordDataSet [] = ([], Map.empty)
 wrapWordDataSet xs = let ws = lines xs in
-                     WDS ws (buildMapByLength ws)
+                     (ws, buildMapByLength ws)
                          
 -- | FIXME: a little annoying that loop the groupBy result in order to get key for map.
 buildMapByLength :: [EnglishWord] -- ^ a alphabet sorted words list

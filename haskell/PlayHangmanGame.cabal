@@ -66,4 +66,5 @@ Executable playHangmanGame
   ghc-options: -O2 
 
   -- TODO: include words.txt
+  --       specify language extension at cabal file
   

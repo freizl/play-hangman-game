@@ -1,4 +1,6 @@
 {-# LANGUAGE DoAndIfThenElse #-}
+{-# LANGUAGE ExistentialQuantification #-}
+
 module GameStrategy where
 
 import Text.Regex
@@ -11,21 +13,39 @@ import Data.List
 import Types
 import WordsOp
 import Hangman
+import Guess
 
-type SimpleStrategyState = StateT SimpleStrategy IO NextGuess
+{-
+  TODO: 1. failure at when define 
+           `class (Guess g, HangmanC h) => GuessAction g h | g -> h where ...`
+-}
 
-nextGuess :: Hangman -> SimpleStrategyState
-nextGuess hg = do
+
+data SimpleStrategy = SimpleStrategy { candidateLetters :: [Letter]
+                                     , candidateWords   :: [EnglishWord]
+                                     , lastLetter       :: Letter
+                                     }
+
+-- | Build a Strategy base on words which have same length to secret word. 
+newSimpleStrategy :: [EnglishWord] -> SimpleStrategy
+newSimpleStrategy xs = SimpleStrategy letters words ' '
+  where letters = buildListLetterFrequency $ buildMapWordsFrequency xs
+        words = xs
+
+instance Show SimpleStrategy where
+  show (SimpleStrategy ls ws ll) = ll : "->" ++ show ls ++ show (take 5 ws)
+
+instance GameStategy SimpleStrategy where
+  nextGuess hg = do
     s1 <- get
     modify (updateNextGuessWords hg)
     ss@(SimpleStrategy cl cw ll) <- get
-    --liftIO $ print $ (show $ gameWrongGuessesMade hg) ++ "," ++ (show $ length cw)
-    -- FIXME: complicated if-else thus need lang ext DoAndIfThenElse
+    -- FIXME: complicated if-else thus need lang ext DoAndIfThenElse. can be simple??
     if (gameWrongGuessesMade hg + length cw <= 5) || gameWrongGuessesMade hg >= 3 then
-      put (SimpleStrategy cl (tail cw) ll) >> return (GW $ head cw)
+      put (SimpleStrategy cl (tail cw) ll) >> return (NextGuess $ GuessWord $ head cw)
     else
-      return (GL ll)
-
+      return (NextGuess $ GuessLetter ll)
+  
 -- | Narrow down possible words for guessing.
 updateNextGuessWords :: Hangman -> SimpleStrategy -> SimpleStrategy
 updateNextGuessWords (Hangman _ _ gsf ils cls iws) (SimpleStrategy cl cw ll) =

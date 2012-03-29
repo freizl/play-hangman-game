@@ -13,8 +13,8 @@ import WordsOp
 
 main :: IO ()
 main = do
-       args <- getArgs
-       WDS ws wm <- defaultWords
+       args      <- getArgs
+       (ws, wm)  <- defaultWords
        rs        <- randomRange (testWordsNum args) (length ws)
        let words = [ ws !! i | i <- rs ]
        ys        <- mapM (playgame' wm) words
@@ -23,17 +23,10 @@ main = do
            testWordsNum []    = 2
            testWordsNum (i:_) = read i
 
-
--- | Build a Strategy base on words which have same length to secret word. 
-buildSimpleStrategy :: [EnglishWord] -> SimpleStrategy
-buildSimpleStrategy xs = SimpleStrategy letters words ' '
-                         where letters = buildListLetterFrequency $ buildMapWordsFrequency xs
-                               words = xs
-
 -- |  Run
-playgame' :: Map.Map Int [EnglishWord] -> SecretWord -> IO GameStatus
+playgame' :: WordsPerLength -> SecretWord -> IO GameStatus
 playgame' map sw = case Map.lookup (length sw) map of
-                     Just xs -> evalStateT ( run (buildSimpleStrategy xs) ) (initHG sw)
+                     Just xs -> evalStateT ( run (newSimpleStrategy xs) ) (initHG sw)
                      Nothing -> return GAME_LOST
   
 -- | FIXME: non-deminited if keeping guessing same letter
@@ -42,16 +35,12 @@ run gs = do
            hg <- get
            case gameStatus hg of
              KEEP_GUESSING -> do
-                              (guess, updatedStrategy) <- lift $ runStateT (nextGuess hg) gs
-                              --liftIO $ print "===========================++"
-                              --liftIO $ print guess
-                              --liftIO $ print updatedStrategy
-                              makeGuess guess
+                              (NextGuess guess, updatedStrategy) <- runStrategy hg gs
+                              put (makeGuess guess hg)
                               logHangmanGame
                               run updatedStrategy
              x             -> return x
+        where runStrategy hg gs = lift $ runStateT (nextGuess hg) gs
+              logHangmanGame = do hg <- get
+                                  liftIO $ print $ displayGame hg
 
-logHangmanGame :: HangmanGame ()
-logHangmanGame = do
-    hg <- get
-    liftIO $ print $ displayGame hg
