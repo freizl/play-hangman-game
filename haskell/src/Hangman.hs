@@ -1,11 +1,7 @@
-{-# LANGUAGE Rank2Types #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-
 module Hangman where
 
 import qualified Data.Set as S
 import Data.List (intercalate)
-import Control.Monad.State
 
 import Types
 

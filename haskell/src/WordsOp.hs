@@ -1,6 +1,3 @@
-{- Load words.txt
--}
-
 module WordsOp
   ( defaultWords
   , buildMapByLength

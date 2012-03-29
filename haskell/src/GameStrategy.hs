@@ -1,13 +1,9 @@
-{-# LANGUAGE DoAndIfThenElse #-}
-{-# LANGUAGE ExistentialQuantification #-}
-
 module GameStrategy where
 
 import Text.Regex
 import Control.Monad.State
 import qualified Data.Map as Map
 import qualified Data.Set as S
-import Control.Monad.Trans
 import Data.List
 
 import Types

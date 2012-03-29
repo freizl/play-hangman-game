@@ -11,11 +11,11 @@ Description:
   2. play hangman agaist each of word
   .
   3. the judgement are:
-     - successful rate
-     - wrong guess rate
-     - running time
+  - successful rate
+  - wrong guess rate
+  - running time
 
-Version:             0.1.1
+Version:             0.2
 Synopsis:            Play Hangman Game
 Homepage:            freizl.github.com
 Copyright:           (c) 2012 Simon Wu
@@ -36,20 +36,20 @@ Flag Prof
 Executable playHangmanGame
   main-is:          main.hs
   hs-source-dirs:   src
-  build-depends:     base         >= 4.2,
-                     containers   >= 0.4,
-                     directory    >= 1.1,
-                     mtl          >= 2.0,
-                     regex-compat >= 0.95,
-                     random       >= 1.0
+  extensions:       ExistentialQuantification, DoAndIfThenElse
+                    --  Rank2Types, MultiParamTypeClasses
+  build-depends:    base         >= 4.2,
+                    containers   >= 0.4,
+                    directory    >= 1.1,
+                    mtl          >= 2.0,
+                    regex-compat >= 0.95,
+                    random       >= 1.0
   -- Other-modules:       
   -- ghc-options: -O2 -prof
-  -- --enable-executable-profiling
   if flag(prof)
     ghc-options: -auto-all -rtsopts
 
 
   -- TODO: is it possible add build-depends automatically??
-  -- TODO: specify language extension at cabal file rather that at src file
   
 
