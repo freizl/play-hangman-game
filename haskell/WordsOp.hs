@@ -55,21 +55,16 @@ englishAlp = "abcdefghijklmnopqrstuvwxyz"
  @param@ a sorted list that has words with same length.
  @return@ {"a": [...], "b":[...], ... }
 -}
-wordsFrequencyMap :: [EnglishWord] -> Map.Map Char [EnglishWord]
-wordsFrequencyMap ws = Map.mapWithKey f init
+buildMapWordsFrequency :: [EnglishWord] -> Map.Map Char [EnglishWord]
+buildMapWordsFrequency ws = Map.mapWithKey f init
                        where init = Map.fromList [ (x, []) | x <- englishAlp ]
                              f k _ = [ b | b <- ws, k `elem` b]
-
-buildMapWordsFrequency :: [EnglishWord] -> Map.Map Char [EnglishWord]
-buildMapWordsFrequency = wordsFrequencyMap
 
 {-
   @param@ wordsObj :: {"a":[...], "b":[...], ...}
   @return@ list which elements are order by word frequency.
           e.g. ["c","a","b"]
 -}
-lettersByWordsFrequency :: Map.Map Char [EnglishWord] -> [Letter]
-lettersByWordsFrequency v = reverse $ map fst $ sortBy (compare `on` swap) $ Map.toList (Map.map length v)
 
 buildListLetterFrequency :: Map.Map Char [EnglishWord] -> [Letter]
-buildListLetterFrequency = lettersByWordsFrequency
+buildListLetterFrequency v = reverse $ map fst $ sortBy (compare `on` swap) $ Map.toList (Map.map length v)

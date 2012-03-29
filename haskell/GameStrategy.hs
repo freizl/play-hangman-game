@@ -21,6 +21,7 @@ nextGuess hg = do
     modify (updateNextGuessWords hg)
     ss@(SimpleStrategy cl cw ll) <- get
     --liftIO $ print $ (show $ gameWrongGuessesMade hg) ++ "," ++ (show $ length cw)
+    -- FIXME: complicated if-else thus need lang ext DoAndIfThenElse
     if (gameWrongGuessesMade hg + length cw <= 5) || gameWrongGuessesMade hg >= 3 then
       put (SimpleStrategy cl (tail cw) ll) >> return (GW $ head cw)
     else
