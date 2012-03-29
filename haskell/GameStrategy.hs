@@ -1,3 +1,4 @@
+{-# LANGUAGE DoAndIfThenElse #-}
 module GameStrategy where
 
 import Text.Regex
