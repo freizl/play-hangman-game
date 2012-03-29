@@ -4,10 +4,11 @@ module GameRandom
 import System.Random
 import qualified Data.Set as S
 
-type Count = Int
+type Count      = Int
 type UpperLimit = Int
-type RandomSet = S.Set Int
+type RandomSet  = S.Set Int
 
+-- | Generate `Count` size Int list.
 randomRange :: Count -> UpperLimit -> IO [Int]
 randomRange c u = do
                   rs <- genNewRandom c u (S.fromList [])

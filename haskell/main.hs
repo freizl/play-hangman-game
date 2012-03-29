@@ -37,7 +37,7 @@ playgame' map sw = case Map.lookup (length sw) map of
                      Nothing -> return GAME_LOST
   
 -- | FIXME: non-deminited if keeping guessing same letter
-run :: SimpleStrategy -> HangmanGameState GameStatus
+run :: SimpleStrategy -> HangmanGame GameStatus
 run gs = do
            hg <- get
            case gameStatus hg of
@@ -51,7 +51,7 @@ run gs = do
                               run updatedStrategy
              x             -> return x
 
-logHangmanGame :: HangmanGameState ()
+logHangmanGame :: HangmanGame ()
 logHangmanGame = do
     hg <- get
     liftIO $ print $ displayGame hg

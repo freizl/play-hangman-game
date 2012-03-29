@@ -12,10 +12,9 @@ import Types
 import WordsOp
 import Hangman
 
-type StrategyState a = StateT a IO NextGuess
 type SimpleStrategyState = StateT SimpleStrategy IO NextGuess
 
-nextGuess :: HangmanGame -> SimpleStrategyState
+nextGuess :: Hangman -> SimpleStrategyState
 nextGuess hg = do
     s1 <- get
     modify (updateNextGuessWords hg)
@@ -28,8 +27,8 @@ nextGuess hg = do
       return (GL ll)
 
 -- | Narrow down possible words for guessing.
-updateNextGuessWords :: HangmanGame -> SimpleStrategy -> SimpleStrategy
-updateNextGuessWords (HG _ _ gsf ils cls iws) (SimpleStrategy cl cw ll) =
+updateNextGuessWords :: Hangman -> SimpleStrategy -> SimpleStrategy
+updateNextGuessWords (Hangman _ _ gsf ils cls iws) (SimpleStrategy cl cw ll) =
     let possibles = fetchWordsPerLetter ll (buildMapWordsFrequency cw)
         i         = S.toList ils
         c         = S.toList cls
@@ -55,9 +54,6 @@ correctGuess lastLetter corrects incorrects origins possibles
   | otherwise                                            = origins
 
 filterPossiblesPerGuessed [] [] _ p = p
---filterPossiblesPerGuessed [] corrects guessedSoFar p = 
---    let reg = subRegex (mkRegex "-") guessedSoFar "." in
---    filter (match reg) p
 filterPossiblesPerGuessed incorrects corrects guessedSoFar p = 
     let neg = if length incorrects > 0 then ("[^" ++ incorrects ++ "]") else "."
         reg = subRegex (mkRegex "-") guessedSoFar neg in

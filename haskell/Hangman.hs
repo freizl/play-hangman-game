@@ -8,29 +8,29 @@ import Control.Monad.State
 import Types
 
 -- | Representation of hangman game
-displayGame :: HangmanGame -> String
+displayGame :: Hangman -> String
 displayGame hg = intercalate ";" 
             $ map (\ fn -> fn hg) [ guessedSoFar , show . gameScore , show . gameStatus ]
 
 -- | A dummy hangman game
-dummyHG = HG "" defaultMaxWrongGuess "" (S.fromList []) (S.fromList []) (S.fromList [])
+dummyHG = Hangman "" defaultMaxWrongGuess "" (S.fromList []) (S.fromList []) (S.fromList [])
 
-initHG :: SecretWord -> HangmanGame
-initHG sw = HG sw defaultMaxWrongGuess (replicate (length sw) ml) (S.fromList []) (S.fromList []) (S.fromList [])
+initHG :: SecretWord -> Hangman
+initHG sw = Hangman sw defaultMaxWrongGuess (replicate (length sw) ml) (S.fromList []) (S.fromList []) (S.fromList [])
 
 -- | Game score calculation
-gameScore :: HangmanGame -> Int
+gameScore :: Hangman -> Int
 gameScore hg 
   | gameStatus hg == GAME_LOST = 25
   | otherwise                  = gameWrongGuessesMade hg + S.size (correctGuessedLetters hg)
 
 -- | Number of wrong guess made so far
-gameWrongGuessesMade :: HangmanGame -> Int
+gameWrongGuessesMade :: Hangman -> Int
 gameWrongGuessesMade hg =  S.size (incorrectGuessedLetters hg)
                          + S.size (incorrectGuessedWords hg)
 
 -- | Current game status
-gameStatus :: HangmanGame -> GameStatus
+gameStatus :: Hangman -> GameStatus
 gameStatus hg
   | guessedSoFar hg == secretWord hg            = GAME_WON
   | gameWrongGuessesMade hg > maxWrongGuesses hg = GAME_LOST                              
@@ -47,7 +47,7 @@ defaultMaxWrongGuess = 5
 -}
 
 -- | Play the game by guessing a letter thus game status would be updated.
-guessLetter :: Letter -> HangmanGame -> HangmanGame
+guessLetter :: Letter -> Hangman -> Hangman
 guessLetter l game = let sw                 = secretWord game
                          gs                 = zipWith (compareLetter l) sw (guessedSoFar game)
                          goodGuess          = l `elem` sw
@@ -61,7 +61,7 @@ guessLetter l game = let sw                 = secretWord game
                       newGame
 
 -- | Play the game by guessing a word thus game status would be updated.
-guessWord :: EnglishWord -> HangmanGame -> HangmanGame
+guessWord :: EnglishWord -> Hangman -> Hangman
 guessWord w game = let sw                 = secretWord game
                        goodGuess          = w == sw
                        originalGs         = guessedSoFar game
@@ -85,11 +85,11 @@ compareLetter x y z
 {-
   Guess Job
 -}
---type HangmanGameState = State HangmanGame GameStatus
-type HangmanGameState = StateT HangmanGame IO
+--type HangmanState = State Hangman GameStatus
+type HangmanGame = StateT Hangman IO
 
 class Guess a where
-  makeGuess :: a -> HangmanGameState GameStatus
+  makeGuess :: a -> HangmanGame GameStatus
   
 {- 
   make a guess either by guessing a letter or a word
