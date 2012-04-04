@@ -39,7 +39,6 @@ instance GameStategy SimpleStrategy where
     modify (updateNextGuessWords hg)
     ss@(SimpleStrategy cl cw ll map) <- get
     -- FIXME: complicated if-else thus need lang ext DoAndIfThenElse. can be simple??
-    liftIO $ print $ take 5 cw
     if (length cw > 0) && ((gameWrongGuessesMade hg + length cw <= 5) || gameWrongGuessesMade hg >= 3) then
       put (SimpleStrategy cl (tail cw) ll map) >> return (NextGuess $ GuessWord $ head cw)
     else

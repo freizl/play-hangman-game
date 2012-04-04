@@ -41,6 +41,5 @@ run gs = do
                               run updatedStrategy
              x             -> return x
         where runStrategy hg gs = lift $ runStateT (nextGuess hg) gs
-              logHangmanGame = do hg <- get
-                                  liftIO $ print $ displayGame hg
+              logHangmanGame = get >>= liftIO . printGame
 

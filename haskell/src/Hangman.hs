@@ -6,9 +6,9 @@ import Data.List (intercalate)
 import Types
 
 -- | Representation of hangman game
-displayGame :: Hangman -> String
-displayGame hg = intercalate ";" 
-            $ map (\ fn -> fn hg) [ guessedSoFar , show . gameScore , show . gameStatus ]
+printGame :: Hangman -> IO ()
+printGame hg = print $ intercalate ";" 
+               $ map (\ fn -> fn hg) [ guessedSoFar , show . gameScore , show . gameStatus ]
 
 -- | A dummy hangman game
 dummyHG = Hangman "" defaultMaxWrongGuess "" (S.fromList []) (S.fromList []) (S.fromList [])
